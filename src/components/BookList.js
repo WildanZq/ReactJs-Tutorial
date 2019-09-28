@@ -1,30 +1,33 @@
 import React from 'react';
 import BookCard from './BookCard';
+import booksAPI from '../apis/books';
 
 export default class BookList extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      books: [
-        {
-          id: 1,
-          title: 'Judul 1',
-          desc: 'Deskripsi 1'
-        }
-      ]
+      books: []
     }
   }
 
-  addBook = () => {
-    let books = this.state.books;
-    books.push({
-      id: this.state.books.length + 1,
-      title: `Judul ${this.state.books.length + 1}`,
-      desc: `Deskripsi ${this.state.books.length + 1}`,
-    });
+  getBooks = async () => {
+    const booksDB = await booksAPI.get('/books.json');
+    let books = [];
+
+    for (const key in booksDB.data) {
+      books.push({
+        id: key,
+        title: booksDB.data[key].title,
+        desc: booksDB.data[key].desc,
+      });
+    }
 
     this.setState({ books });
+  }
+
+  componentDidMount() {
+    this.getBooks();
   }
 
   render() {
@@ -42,9 +45,6 @@ export default class BookList extends React.Component {
             ))
           }
         </div>
-        <button onClick={this.addBook} className='btn btn-primary mt-4'>
-          Create Book
-        </button>
       </div>
     );
   }

@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link } from 'react-router-dom';
+import booksAPI from '../apis/books';
 
 export default class BookCreate extends React.Component {
   constructor(props) {
@@ -10,15 +12,26 @@ export default class BookCreate extends React.Component {
     }
   }
   
-  onSubmit = (e) => {
+  onSubmit = async (e) => {
     e.preventDefault();
-    console.log(this.state.title);
-    console.log(this.state.desc);
+
+    if (this.state.title === '' || this.state.desc === '') {
+      alert('Isi semua input');
+      return;
+    }
+
+    await booksAPI.post('/books.json', {
+      title: this.state.title,
+      desc: this.state.desc,
+    });
+
+    this.props.history.push('/');
   }
 
   render() {
     return (
       <div>
+        <Link to='/' className='btn btn-outline-secondary mb-4'>Back</Link>
         <form onSubmit={this.onSubmit}>
           <div className='form-group'>
             <label htmlFor='title'>Title</label>
