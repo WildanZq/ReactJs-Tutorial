@@ -1,33 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import BookCard from './BookCard';
-import booksAPI from '../apis/books';
+import { getBooks } from '../actions';
 
-export default class BookList extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      books: []
-    }
-  }
-
-  getBooks = async () => {
-    const booksDB = await booksAPI.get('/books.json');
-    let books = [];
-
-    for (const key in booksDB.data) {
-      books.push({
-        id: key,
-        title: booksDB.data[key].title,
-        desc: booksDB.data[key].desc,
-      });
-    }
-
-    this.setState({ books });
-  }
-
+class BookList extends React.Component {
   componentDidMount() {
-    this.getBooks();
+    this.props.getBooks();
   }
 
   render() {
@@ -35,12 +13,12 @@ export default class BookList extends React.Component {
       <div>
         <div className='d-flex flex-wrap'>
           {
-            this.state.books.map(book => (
+            this.props.books.map(book => (
               <BookCard
-                key={book.id}
-                id={book.id}
-                title={book.title}
-                desc={book.desc}
+                key={book[0]}
+                id={book[0]}
+                title={book[1].title}
+                desc={book[1].desc}
               />
             ))
           }
@@ -49,3 +27,14 @@ export default class BookList extends React.Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    books: Object.entries(state.books),
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  { getBooks }
+)(BookList);

@@ -1,38 +1,31 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import booksAPI from '../apis/books'
+import { connect } from 'react-redux';
+import { getBook } from '../actions';
 
-export default class BookDetail extends React.Component {
-  constructor(props) {
-    super(props)
-  
-    this.state = {
-       title: '',
-       desc: '',
-    }
-  }
-  
-
+class BookDetail extends React.Component {  
   componentDidMount() {
-    this.getData();
-  }
-
-  getData = async () => {
-    const book = await booksAPI.get(`/books/${this.props.match.params.id}.json`);
-    
-    this.setState({
-      title: book.data.title,
-      desc: book.data.desc,
-    });
+    this.props.getBook(this.props.match.params.id);
   }
 
   render() {
     return (
       <div>
         <Link to='/' className='btn btn-outline-secondary mb-4'>Back</Link>
-        <h1>{this.state.title}</h1>
-        <p>{this.state.desc}</p>
+        <h1>{this.props.book ? this.props.book.title : ''}</h1>
+        <p>{this.props.book ? this.props.book.desc : ''}</p>
       </div>
     );
   }
 }
+
+const  mapStateToProps = (state, ownProps) => {
+  return {
+    book: state.books[ownProps.match.params.id],
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  { getBook }
+)(BookDetail);
